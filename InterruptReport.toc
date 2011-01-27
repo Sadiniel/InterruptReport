@@ -1,0 +1,9 @@
+## Interface: 40000
+## Title: InterruptReport
+## Version: 4.0.3.01
+## Author: Sadiniel <Dispel Stupid> of Garona-US
+## Notes: Tracks dispels during boss encounters and reports preventable damage.
+## SavedVariablesPerCharacter: InterruptReportConfig
+
+InterruptReport.lua
+InterruptReport.xml

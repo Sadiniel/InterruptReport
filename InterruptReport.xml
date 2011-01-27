@@ -1,0 +1,10 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+	<Script file="InterruptReport.lua"/>
+	<Frame name="InterruptReport">
+		<Scripts>
+			<OnLoad function="InerruptReport_OnLoad" />
+			<OnEvent function="InerruptReport_OnEvent" />
+		</Scripts>
+	</Frame>
+</Ui>
