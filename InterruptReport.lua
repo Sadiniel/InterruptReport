@@ -192,9 +192,9 @@ function InterruptReport_Announce()
 	end
 	
 	if ( channel == "self") then
-		ChatFrame1:AddMessage( "Yeilding a grand total of: " InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , .9, 0, .9);
+		ChatFrame1:AddMessage( "Yeilding a grand total of: " .. InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , .9, 0, .9);
 	else
-		SendChatMessage( "Yeilding a grand total of: " InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , channel , nil , nil );
+		SendChatMessage( "Yeilding a grand total of: " .. InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , channel , nil , nil );
 	end
 	
 	for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
@@ -247,7 +247,7 @@ function InterruptReport_OnEvent(self, event, ...)
 		-- from the saved variables file before we see it
 	
 		InterruptReport_Cancel();
-	
+		
 	elseif	( ( event == "CHAT_MSG_ADDON" ) and ( select(1, ...) == "InterruptReport" ) ) then
 		
 		-- If someone announces before you their addon tells yours name of the target they
