@@ -3,8 +3,12 @@
 	<Script file="InterruptReport.lua"/>
 	<Frame name="InterruptReport">
 		<Scripts>
-			<OnLoad function="InerruptReport_OnLoad" />
-			<OnEvent function="InerruptReport_OnEvent" />
+			<OnLoad>
+				InterruptReport_OnLoad(self);
+			</OnLoad>
+			<OnEvent>
+				InterruptReport_OnEvent(self, event, ...);
+			</OnEvent>
 		</Scripts>
 	</Frame>
 </Ui>

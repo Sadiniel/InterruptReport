@@ -140,8 +140,6 @@ function InterruptReport_OnLoad(self)
 	self:RegisterEvent("PLAYER_LOGIN");
 	self:RegisterEvent("CHAT_MSG_ADDON");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
-	self:RegisterEvent("PLAYER_REGEN_ENABLED");
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
 	
 	-- If we don't have a Saved Variables entry, we will after this
 	-- Saved variables are by character so if you just want to announce on certain ones you can.
@@ -158,6 +156,7 @@ function InterruptReport_OnLoad(self)
 	SLASH_INTERRUPTREPORT3 = "/intrep"
 	SLASH_INTERRUPTREPORT4 = "/intreport"
 	SLASH_INTERRUPTREPORT5 = "/interruptreport"
+	
 end
 
 function InterruptReport_SlashCommand()
@@ -168,16 +167,67 @@ function InterruptReport_SlashCommand()
 	InterfaceOptionsFrame_OpenToCategory(InterruptReportOptions);
 end
 
-function InterruptReport_Announce( dataList, channel )
+function InterruptReport_Announce()
 
 	-- This section actually makes the announcements to chat and sends announcement notification
 	-- over the addon channel to prevent others using the addon from repeating the announcement
-		
+	
+	channel = InterruptReportConfig.ANNOUNCE_CHANNEL;
+	
+	for i=2, #InterruptReportConfig.DAMAGE_LIST, 5 do
+		if ( channel == "self") then
+			ChatFrame1:AddMessage(	InterruptReportConfig.DAMAGE_LIST[i] .. " was hit " .. 
+									InterruptReportConfig.DAMAGE_LIST[i+1] .. " times, taking " .. 
+									InterruptReportConfig.DAMAGE_LIST[i+2] .. " damage while resisting " .. 
+									InterruptReportConfig.DAMAGE_LIST[i+3] .. " and absorbing " .. 
+									InterruptReportConfig.DAMAGE_LIST[i+4] .. "." , .9, 0, .9);
+		else
+			SendChatMessage(	InterruptReportConfig.DAMAGE_LIST[i] .. " was hit " .. 
+								InterruptReportConfig.DAMAGE_LIST[i+1] .. " times, taking " .. 
+								InterruptReportConfig.DAMAGE_LIST[i+2] .. " damage while resisting " .. 
+								InterruptReportConfig.DAMAGE_LIST[i+3] .. " and absorbing " .. 
+								InterruptReportConfig.DAMAGE_LIST[i+4] .. "." , channel , nil , nil );
+			SendAddonMessage( "InterruptReport" , "1" , channel , nil);
+		end
+	end
+	
 	if ( channel == "self") then
-		ChatFrame1:AddMessage( dataList[1] , .9, 0, .9);
+		ChatFrame1:AddMessage( "Yeilding a grand total of: " InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , .9, 0, .9);
 	else
-		SendChatMessage( dataList[1] , channel , nil , nil );
-		SendAddonMessage( "InterruptReport" , "1" , channel , nil);
+		SendChatMessage( "Yeilding a grand total of: " InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , channel , nil , nil );
+	end
+	
+	for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
+		if ( channel == "self") then
+			ChatFrame1:AddMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
+									InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , .9, 0, .9);
+		else
+			SendChatMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
+								InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , channel , nil , nil );
+		end
+	end
+	
+	self:UnRegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+	self:CancelTimer(IR_COMBAT_CHECK);
+	
+end
+
+function InterruptReport_CombatCheck()
+	
+	local combat = false;
+	local raidmembers = GetNumRaidMembers();
+	
+	for i = 1, raidmembers do
+		local unitname = GetRaidRosterInfo(i);
+		if ( unitname ) then
+			if ( UnitAffectingCombat(unitname) ) then
+				combat = true;
+			end
+		end
+	end
+	
+	if ( combat == false ) then
+		InterruptReport_Announce();
 	end
 	
 end
@@ -211,58 +261,74 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 			local inInstance, instanceType = IsInInstance();
 		
-			if	(inInstance) then
+			if	( ( inInstance ) and ( instanceType == "raid" ) ) then
 				
 				ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9);
+				self:ScheduleRepeatingTimer(IR_COMBAT_CHECK, InterruptReport_CombatCheck(), 4)
+				self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+				if	(InterruptReportConfig.DAMAGE_LIST == nil) then InterruptReportConfig.DAMAGE_LIST = {0}; end
+				if	(InterruptReportConfig.INTERRUPT_LIST == nil) then InterruptReportConfig.INTERRUPT_LIST = {}; end
 				
 			end
 			
 		end
-	
-	elseif	( event == "PLAYER_REGEN_ENABLED" ) then
-		
-		if	( InterruptReportConfig.ENABLED ) then
-		
-			local inInstance, instanceType = IsInInstance();
-		
-			if	(inInstance) then
 			
-				ChatFrame1:AddMessage( "Combat Ended." , .9, 0, .9);
-				
-			end
-			
-		end
-		
 	elseif	( event == "COMBAT_LOG_EVENT_UNFILTERED" ) then
 	
-		if	( InterruptReportConfig.ENABLED ) then
+		local timestamp, logtype, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, -- arg1  to arg8
+		spellId, spellName, spellSchool, -- arg9  to arg11
+		amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ... ; -- arg12 to arg20
 		
-			local inInstance, instanceType = IsInInstance();
+		if ( logtype == "SPELL_DAMAGE" ) then
 		
-			if	(inInstance) then
+			if ( spellName == "Arcane Annihilator" ) then
 			
-				local timestamp, logtype, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, -- arg1  to arg8
-				spellId, spellName, spellSchool, -- arg9  to arg11
-				amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ... ; -- arg12 to arg20
-				
-				if ( logtype == "SPELL_DAMAGE" ) then
-				
-					if ( spellName == "Arcane Annihilator" ) then
+				if ( resisted == nil ) then resisted = 0 end
+				if ( absorbed == nil ) then absorbed = 0 end
 
-						ChatFrame1:AddMessage( "Arcane Annihilator hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9);
-						
+				ChatFrame1:AddMessage( "Arcane Annihilator hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9);
+		
+				InterruptReportConfig.DAMAGE_LIST[1] = InterruptReportConfig.DAMAGE_LIST[1] + amount;
+				
+				if tContains(InterruptReportConfig.DAMAGE_LIST, destName) then
+					local n = 1;
+					while InterruptReportConfig.DAMAGE_LIST[n] do
+						if ( InterruptReportConfig.DAMAGE_LIST[n] == destName ) then
+							InterruptReportConfig.DAMAGE_LIST[n+1] = InterruptReportConfig.DAMAGE_LIST[n+1] + 1;
+							InterruptReportConfig.DAMAGE_LIST[n+2] = InterruptReportConfig.DAMAGE_LIST[n+2] + amount;
+							InterruptReportConfig.DAMAGE_LIST[n+3] = InterruptReportConfig.DAMAGE_LIST[n+3] + resisted;
+							InterruptReportConfig.DAMAGE_LIST[n+4] = InterruptReportConfig.DAMAGE_LIST[n+4] + absorbed;
+						end
+						n = n + 1;
 					end
-					
+				else
+					tinsert(InterruptReportConfig.DAMAGE_LIST, 1);
+					tinsert(InterruptReportConfig.DAMAGE_LIST, destName);
+					tinsert(InterruptReportConfig.DAMAGE_LIST, amount);
+					tinsert(InterruptReportConfig.DAMAGE_LIST, resisted);
+					tinsert(InterruptReportConfig.DAMAGE_LIST, absorbed);
 				end
-				
-				if ( logtype == "SPELL_INTERRUPT" ) then
+			end
 			
-					if ( overkill == "Arcane Annihilator" ) then
+		end
+		
+		if ( logtype == "SPELL_INTERRUPT" ) then
+		
+			if ( overkill == "Arcane Annihilator" ) then
 
-						ChatFrame1:AddMessage( "Arcane Annihilator was interrupted by " .. sourceName , .9, 0, .9);
-						
+				ChatFrame1:AddMessage( "Arcane Annihilator was interrupted by " .. sourceName , .9, 0, .9);
+				
+				if tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) then
+					local n = 1;
+					while InterruptReportConfig.INTERRUPT_LIST[n] do
+						if ( InterruptReportConfig.INTERRUPT_LIST[n] == sourceName ) then
+							InterruptReportConfig.INTERRUPT_LIST[n+1] = InterruptReportConfig.INTERRUPT_LIST[n+1] + 1;
+						end
+						n = n + 1;
 					end
-					
+				else
+					tinsert(InterruptReportConfig.INTERRUPT_LIST, sourceName);
+					tinsert(InterruptReportConfig.INTERRUPT_LIST, 1);
 				end
 				
 			end
@@ -271,4 +337,4 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 	end	
 	
-end -- 274 lines of boring code. With no library dependencies.
+end -- 332 lines of boring code. With no library dependencies.
