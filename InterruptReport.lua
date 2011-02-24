@@ -3,17 +3,16 @@
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
-local SPELL_LIST = {	"Arcane Annihilator",
-						"Arcane Storms",
-						"Blast Nova",
-						"Shadow Nova",
-						"Depravity",
+local SPELL_LIST = {	"Arcane Annihilator", 	-- Arcanotron, Blackwing Descent
+						"Arcane Storm",			-- Maloriak, Blackwing Descent
+						"Blast Nova",			-- Nefarian, Blackwing Descent
+						"Shadow Nova", 			-- Halfus Wyrmbreaker, Bastion of Twilight
+						"Depravity",			-- Cho'gall, Bastion of Twilight
 						}
 
 function InterruptReport_Config()
 
 	-- This is to set up the options window.
-	-- Copy/pasta'd from my other addon.
 	
 	InterruptReportOptions = CreateFrame("Frame", "InterruptReportOptionPanel", UIParent);
 	InterruptReportOptions.name = "InterruptReport";
@@ -37,6 +36,7 @@ function InterruptReport_Config()
 	
 	InterruptReportOptions.okay = function (self) InterruptReport_Okay(); end;
 	InterruptReportOptions.cancel = function (self) InterruptReport_Cancel(); end;
+	InterruptReportOptions.default = function (self) InterruptReport_Default(); end;
 end
 
 function ChannelMenu_OnEvent(self, event, ...)
@@ -93,7 +93,7 @@ function ChannelMenu_Initialize(self)
 	
 	info.text = "Group";
 	info.func = ChannelMenu_OnClick;
-	info.value = "group";
+	info.value = "raid";
 	if ( info.value == selectedValue ) then
 		info.checked = 1;
 	else
@@ -120,7 +120,7 @@ end
 function InterruptReport_Okay()
 
 	-- When you click that little "Okay" button in the options window
-	-- the game saves all that information to your Saved Variables
+	-- the game saves that information to your Saved Variables
 	
 	InterruptReportConfig.ENABLED = EnabledCheck:GetChecked();
 	InterruptReportConfig.ANNOUNCE_CHANNEL = UIDropDownMenu_GetSelectedValue(ChannelMenu);
@@ -138,11 +138,22 @@ function InterruptReport_Cancel()
 	
 end
 
+function InterruptReport_Default()
+
+	-- When you click that little "Cancel" button in the options window
+	-- the game replaces the information in the window with your Saved Variables
+	
+	EnabledCheck:SetChecked(nil);
+	ChannelMenu:SetValue("raid");
+	ChannelMenu:RefreshValue();
+	
+end
+
 function InterruptReport_OnLoad(self)
 
 	-- Version message for the chat window and registering events
 	
-	ChatFrame1:AddMessage("InterruptReport version " .. IRversion .. " loaded successfully.", .9, 0, .9);
+	-- ChatFrame1:AddMessage("InterruptReport version " .. IRversion .. " loaded.", .9, 0, .9);
 	self:RegisterEvent("PLAYER_LOGIN");
 	self:RegisterEvent("CHAT_MSG_ADDON");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
@@ -173,62 +184,51 @@ function InterruptReport_SlashCommand()
 	InterfaceOptionsFrame_OpenToCategory(InterruptReportOptions);
 end
 
-function InterruptReport_Announce()
+function InterruptReport_Announce(self)
 
 	-- This section actually makes the announcements to chat and sends announcement notification
 	-- over the addon channel to prevent others using the addon from repeating the announcement
 	
 	local channel = InterruptReportConfig.ANNOUNCE_CHANNEL;
 	
-	for i=2, #InterruptReportConfig.DAMAGE_LIST, 5 do
-		if ( channel == "self") then
-			ChatFrame1:AddMessage(	InterruptReportConfig.DAMAGE_LIST[i] .. " was hit " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+1] .. " times, taking " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+2] .. " damage while resisting " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+3] .. " and absorbing " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+4] .. "." , .9, 0, .9);
+	if ( InterruptReportConfig.DAMAGE_TAKEN ) then
+				
+		if ( channel == "self" ) then
+			ChatFrame1:AddMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , .9, 0, .9);
 		else
-			if ( InterruptReportConfig.REPORTED ~= 1 ) then
-				SendChatMessage(	InterruptReportConfig.DAMAGE_LIST[i] .. " was hit " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+1] .. " times, taking " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+2] .. " damage while resisting " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+3] .. " and absorbing " .. 
-									InterruptReportConfig.DAMAGE_LIST[i+4] .. "." , channel , nil , nil );
-				SendAddonMessage( "InterruptReport" , "1" , channel , nil);
+			if ( InterruptReportConfig.REPORTED == nil ) then
+				SendChatMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , channel , nil , nil );
+			end
+		end
+	
+		for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
+			if ( channel == "self") then
+				ChatFrame1:AddMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
+										InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , .9, 0, .9);
+			else
+				if ( InterruptReportConfig.REPORTED ) then
+					-- ChatFrame1:AddMessage( InterruptReportConfig.REPORTED .. " already announced damage and interrupts." , .9, 0, .9);
+				else
+					SendChatMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
+										InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , channel , nil , nil );
+					SendAddonMessage( "InterruptReport" , UnitName("player") , channel , nil);
+				end
 			end
 		end
 	end
 	
-	if ( channel == "self") then
-		ChatFrame1:AddMessage( "Yeilding a grand total of: " .. InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , .9, 0, .9);
-	else
-		if ( InterruptReportConfig.REPORTED ~= 1 ) then
-			SendChatMessage( "Yeilding a grand total of: " .. InterruptReportConfig.DAMAGE_LIST[1] .. " preventable damage." , channel , nil , nil );
-		end
-	end
-	
-	for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
-		if ( channel == "self") then
-			ChatFrame1:AddMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
-									InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , .9, 0, .9);
-		else
-			if (InterruptReportConfig.REPORTED ~= 1 ) then
-				SendChatMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
-									InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , channel , nil , nil );
-			end
-		end
-	end
+	-- ChatFrame1:AddMessage( "Combat Ended." , .9, 0, .9);
 	
 	InterruptReportConfig.REPORTED = nil;
 	InterruptReportConfig.NEXT_CHECK = nil;
-	self:UnRegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
 	
-	wipe(InterruptReportConfig.DAMAGE_LIST);
+	InterruptReportConfig.DAMAGE_TAKEN = nil;
 	wipe(InterruptReportConfig.INTERRUPT_LIST);
 	
 end
 
-function InterruptReport_CombatCheck()
+function InterruptReport_CombatCheck(self)
 	
 	local combat = false;
 	local raidmembers = GetNumRaidMembers();
@@ -243,7 +243,7 @@ function InterruptReport_CombatCheck()
 	end
 	
 	if ( combat == false ) then
-		InterruptReport_Announce();
+		InterruptReport_Announce(self);
 	end
 	
 end
@@ -263,6 +263,8 @@ function InterruptReport_OnEvent(self, event, ...)
 		-- from the saved variables file before we see it
 	
 		InterruptReport_Cancel();
+		
+		ChatFrame1:AddMessage("InterruptReport version " .. IRversion .. " loaded.", .9, 0, .9);
 	
 	elseif	( ( event == "CHAT_MSG_ADDON" ) and ( select(1, ...) == "InterruptReport" ) ) then
 		
@@ -279,9 +281,8 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 			if	( ( inInstance ) and ( instanceType == "raid" ) ) then
 				
-				ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9);
+				-- ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9);
 				self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-				if	(InterruptReportConfig.DAMAGE_LIST == nil) then InterruptReportConfig.DAMAGE_LIST = {0}; end
 				if	(InterruptReportConfig.INTERRUPT_LIST == nil) then InterruptReportConfig.INTERRUPT_LIST = {}; end
 				
 			end
@@ -296,44 +297,26 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 		if ( logtype == "SPELL_DAMAGE" ) then
 		
-			if ( tcontains(SPELL_LIST, spellName) ) then
+			if ( tContains(SPELL_LIST, spellName) ) then
 			
-				if ( resisted == nil ) then resisted = 0 end
-				if ( absorbed == nil ) then absorbed = 0 end
-
-				ChatFrame1:AddMessage( spellName .. " hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9);
+				-- ChatFrame1:AddMessage( spellName .. " hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9);
 		
-				InterruptReportConfig.DAMAGE_LIST[1] = InterruptReportConfig.DAMAGE_LIST[1] + amount;
+				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
+				if ( amount == nil ) then amount = 0; end
 				
-				if tContains(InterruptReportConfig.DAMAGE_LIST, destName) then
-					local n = 1;
-					while InterruptReportConfig.DAMAGE_LIST[n] do
-						if ( InterruptReportConfig.DAMAGE_LIST[n] == destName ) then
-							InterruptReportConfig.DAMAGE_LIST[n+1] = InterruptReportConfig.DAMAGE_LIST[n+1] + 1;
-							InterruptReportConfig.DAMAGE_LIST[n+2] = InterruptReportConfig.DAMAGE_LIST[n+2] + amount;
-							InterruptReportConfig.DAMAGE_LIST[n+3] = InterruptReportConfig.DAMAGE_LIST[n+3] + resisted;
-							InterruptReportConfig.DAMAGE_LIST[n+4] = InterruptReportConfig.DAMAGE_LIST[n+4] + absorbed;
-						end
-						n = n + 1;
-					end
-				else
-					tinsert(InterruptReportConfig.DAMAGE_LIST, 1);
-					tinsert(InterruptReportConfig.DAMAGE_LIST, destName);
-					tinsert(InterruptReportConfig.DAMAGE_LIST, amount);
-					tinsert(InterruptReportConfig.DAMAGE_LIST, resisted);
-					tinsert(InterruptReportConfig.DAMAGE_LIST, absorbed);
-				end
+				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
+				
 			end
 			
 		end
 		
 		if ( logtype == "SPELL_INTERRUPT" ) then
 		
-			if ( tcontains(SPELL_LIST, overkill) ) then
+			if ( tContains(SPELL_LIST, overkill) ) then
 
 				ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9);
 				
-				if tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) then
+				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
 					local n = 1;
 					while InterruptReportConfig.INTERRUPT_LIST[n] do
 						if ( InterruptReportConfig.INTERRUPT_LIST[n] == sourceName ) then
@@ -352,9 +335,9 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 		if (( InterruptReportConfig.NEXT_CHECK == nil ) or ( InterruptReportConfig.NEXT_CHECK <= time() )) then
 			InterruptReportConfig.NEXT_CHECK = time() + 2;
-			InterruptReport_CombatCheck();
+			InterruptReport_CombatCheck(self);
 		end
 		
 	end	
 	
-end -- 360 lines of boring code. With no library dependencies.
+end -- 343 lines of boring code. With no library dependencies.
