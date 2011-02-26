@@ -194,7 +194,7 @@ function InterruptReport_Announce(self)
 	if ( InterruptReportConfig.DAMAGE_TAKEN ) then
 				
 		if ( channel == "self" ) then
-			ChatFrame1:AddMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , .9, 0, .9);
+			ChatFrame1:AddMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , .9, .9, .9);
 		else
 			if ( InterruptReportConfig.REPORTED == nil ) then
 				SendChatMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , channel , nil , nil );
@@ -204,7 +204,7 @@ function InterruptReport_Announce(self)
 		for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
 			if ( channel == "self") then
 				ChatFrame1:AddMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
-										InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , .9, 0, .9);
+										InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , .9, .9, .9);
 			else
 				if ( InterruptReportConfig.REPORTED ) then
 					-- ChatFrame1:AddMessage( InterruptReportConfig.REPORTED .. " already announced damage and interrupts." , .9, 0, .9);
@@ -314,7 +314,7 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 			if ( tContains(SPELL_LIST, overkill) ) then
 
-				ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9);
+				-- ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9);
 				
 				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
 					local n = 1;
