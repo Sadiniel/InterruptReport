@@ -3,11 +3,12 @@
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
-local SPELL_LIST = {	"Arcane Annihilator", 	-- Arcanotron, Blackwing Descent
+local SPELL_LIST = {	"Arcane Annihilator", 	-- Arcanotron, Omnotron Defense System, Blackwing Descent
 						"Arcane Storm",			-- Maloriak, Blackwing Descent
-						"Blast Nova",			-- Nefarian, Blackwing Descent
-						"Shadow Nova", 			-- Halfus Wyrmbreaker, Bastion of Twilight
-						"Depravity",			-- Cho'gall, Bastion of Twilight
+						"Blast Nova",			-- Chromatic Prototype, Nefarian, Blackwing Descent
+						"Shadow Nova", 			-- Halfus Wyrmbreaker, Bastion of Twilight (Only if Storm Rider is active)
+						"Hydro Lance", 			-- Feludius, Ascendant Council, Bastion of Twilight
+						"Depravity",			-- Corrupting Adherent, Cho'gall, Bastion of Twilight
 						}
 
 function InterruptReport_Config()
@@ -23,16 +24,20 @@ function InterruptReport_Config()
 	InterruptReportOptions.title:SetPoint("TOPLEFT", InterruptReportOptions,"TOPLEFT" , 10, -15);
 
 	InterruptReportOptions.EnabledCheck = CreateFrame("CheckButton", "EnabledCheck", InterruptReportOptions, "InterfaceOptionsCheckButtonTemplate");
-	EnabledCheckText:SetText("Enable / Disable this addon.");
+	EnabledCheckText:SetText("Enable this addon.");
 	InterruptReportOptions.EnabledCheck:SetPoint("TOPLEFT", InterruptReportOptions, "TOPLEFT", 15, -50);
 	
-	ChannelMenu = CreateFrame("Frame", "AnnounceChannel", InterruptReportOptions, "UIDropDownMenuTemplate");
-	ChannelMenu:SetPoint("TOPLEFT", InterruptReportOptions, "TOPLEFT" , 30, -80);
-	ChannelMenu_OnEvent(ChannelMenu);
+	InterruptReportOptions.NoDamageCheck = CreateFrame("CheckButton", "NoDamageCheck", InterruptReportOptions, "InterfaceOptionsCheckButtonTemplate");
+	NoDamageCheckText:SetText("Annunce Interrupts when all casts interrupted.");
+	InterruptReportOptions.NoDamageCheck:SetPoint("TOPLEFT", InterruptReportOptions, "TOPLEFT", 30, -80);
 	
+	ChannelMenu = CreateFrame("Frame", "AnnounceChannel", InterruptReportOptions, "UIDropDownMenuTemplate");
+	ChannelMenu:SetPoint("TOPLEFT", InterruptReportOptions, "TOPLEFT" , 30, -110);
+	ChannelMenu_OnEvent(ChannelMenu);
+		
 	InterruptReportOptions.AnnounceChannelText = InterruptReportOptions:CreateFontString(nil, "OVERLAY", "GameFontNormal");
 	InterruptReportOptions.AnnounceChannelText:SetText("Announcement Channel");
-	InterruptReportOptions.AnnounceChannelText:SetPoint("TOPLEFT", InterruptReportOptions,"TOPLEFT" , 190, -87);
+	InterruptReportOptions.AnnounceChannelText:SetPoint("TOPLEFT", InterruptReportOptions,"TOPLEFT" , 190, -117);
 	
 	InterruptReportOptions.okay = function (self) InterruptReport_Okay(); end;
 	InterruptReportOptions.cancel = function (self) InterruptReport_Cancel(); end;
@@ -123,6 +128,7 @@ function InterruptReport_Okay()
 	-- the game saves that information to your Saved Variables
 	
 	InterruptReportConfig.ENABLED = EnabledCheck:GetChecked();
+	InterruptReportConfig.NO_DAMAGE = NoDamageCheck:GetChecked();
 	InterruptReportConfig.ANNOUNCE_CHANNEL = UIDropDownMenu_GetSelectedValue(ChannelMenu);
     
 end
@@ -133,6 +139,7 @@ function InterruptReport_Cancel()
 	-- the game replaces the information in the window with your Saved Variables
 	
 	EnabledCheck:SetChecked(InterruptReportConfig.ENABLED);
+	NoDamageCheck:SetChecked(InterruptReportConfig.NO_DAMAGE);
 	ChannelMenu:SetValue(InterruptReportConfig.ANNOUNCE_CHANNEL);
 	ChannelMenu:RefreshValue();
 	
@@ -144,6 +151,7 @@ function InterruptReport_Default()
 	-- the game replaces the information in the window with your Saved Variables
 	
 	EnabledCheck:SetChecked(nil);
+	NoDamageCheck:SetChecked(nil);
 	ChannelMenu:SetValue("raid");
 	ChannelMenu:RefreshValue();
 	
@@ -191,8 +199,10 @@ function InterruptReport_Announce(self)
 	
 	local channel = InterruptReportConfig.ANNOUNCE_CHANNEL;
 	
-	if ( InterruptReportConfig.DAMAGE_TAKEN ) then
-				
+	if ( ( InterruptReportConfig.DAMAGE_TAKEN ) or ( ( #InterruptReportConfig.INTERRUPT_LIST > 1 ) and ( InterruptReportConfig.NO_DAMAGE ) ) ) then
+		
+		if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
+		
 		if ( channel == "self" ) then
 			ChatFrame1:AddMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , .9, .9, .9);
 		else
