@@ -204,10 +204,10 @@ function InterruptReport_Announce(self)
 		if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
 		
 		if ( channel == "self" ) then
-			ChatFrame1:AddMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , .9, .9, .9);
+			ChatFrame1:AddMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
 		else
 			if ( InterruptReportConfig.REPORTED == nil ) then
-				SendChatMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken." , channel , nil , nil );
+				SendChatMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
 			end
 		end
 	
@@ -234,6 +234,7 @@ function InterruptReport_Announce(self)
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
 	
 	InterruptReportConfig.DAMAGE_TAKEN = nil;
+	InterruptReportConfig.DAMAGE_SPELL = nil;
 	wipe(InterruptReportConfig.INTERRUPT_LIST);
 	
 end
@@ -314,6 +315,7 @@ function InterruptReport_OnEvent(self, event, ...)
 				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
 				if ( amount == nil ) then amount = 0; end
 				
+				InterruptReportConfig.DAMAGE_SPELL = spellName;
 				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
 				
 			end
@@ -325,6 +327,7 @@ function InterruptReport_OnEvent(self, event, ...)
 			if ( tContains(SPELL_LIST, overkill) ) then
 
 				-- ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9);
+				InterruptReportConfig.DAMAGE_SPELL = overkill;
 				
 				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
 					local n = 1;
@@ -350,4 +353,4 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 	end	
 	
-end -- 343 lines of boring code. With no library dependencies.
+end -- 356 lines of boring code. With no library dependencies.
