@@ -227,7 +227,7 @@ function InterruptReport_Announce(self)
 		end
 	end
 	
-	-- ChatFrame1:AddMessage( "Combat Ended." , .9, 0, .9);
+	-- ChatFrame1:AddMessage( "Combat Ended." , .9, 0, .9); -- debug
 	
 	InterruptReportConfig.REPORTED = nil;
 	InterruptReportConfig.NEXT_CHECK = nil;
@@ -292,7 +292,8 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 			if	( ( inInstance ) and ( instanceType == "raid" ) ) then
 				
-				-- ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9);
+				-- ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9); -- debug
+				
 				self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
 				if	(InterruptReportConfig.INTERRUPT_LIST == nil) then InterruptReportConfig.INTERRUPT_LIST = {}; end
 				
@@ -302,14 +303,15 @@ function InterruptReport_OnEvent(self, event, ...)
 			
 	elseif	( event == "COMBAT_LOG_EVENT_UNFILTERED" ) then
 	
-		local timestamp, logtype, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, -- arg1  to arg8
-		spellId, spellName, spellSchool, -- arg9  to arg11
-		amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ... ; -- arg12 to arg20
+		local timestamp, logtype, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, -- arg1  to arg9
+		spellId, spellName, spellSchool, -- arg10  to arg12
+		amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ... ; -- arg13 to arg21
 		
 		if ( logtype == "SPELL_DAMAGE" ) then
 		
 			if ( tContains(SPELL_LIST, spellName) ) then
 			
+				-- debug
 				-- ChatFrame1:AddMessage( spellName .. " hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9);
 		
 				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
@@ -326,7 +328,7 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 			if ( tContains(SPELL_LIST, overkill) ) then
 
-				-- ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9);
+				-- ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9); -- debug
 				InterruptReportConfig.DAMAGE_SPELL = overkill;
 				
 				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
@@ -353,4 +355,4 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 	end	
 	
-end -- 356 lines of boring code. With no library dependencies.
+end -- 358 lines of boring code. With no library dependencies.
