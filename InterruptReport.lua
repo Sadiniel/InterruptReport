@@ -192,35 +192,60 @@ function InterruptReport_SlashCommand()
 	InterfaceOptionsFrame_OpenToCategory(InterruptReportOptions);
 end
 
+function InterruptReport_NumberFormat(number)
+
+	-- recursive number formatting, sure I could have used a for or while loop, but where's the fun in that.
+	
+	local returnval;
+	
+	if ( number > 999 ) then
+		returnval = InterruptReport_NumberFormat(floor(number/1000));
+		number = format(",%03i", number % 1000);
+	else
+		returnval = "";
+	end
+	
+	return ( returnval .. number );
+end
+
 function InterruptReport_Announce(self)
 
 	-- This section actually makes the announcements to chat and sends announcement notification
 	-- over the addon channel to prevent others using the addon from repeating the announcement
 	
 	local channel = InterruptReportConfig.ANNOUNCE_CHANNEL;
+	local timesortime = " times.";
 	
 	if ( ( InterruptReportConfig.DAMAGE_TAKEN ) or ( ( #InterruptReportConfig.INTERRUPT_LIST > 1 ) and ( InterruptReportConfig.NO_DAMAGE ) ) ) then
 		
 		if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
 		
+		local formattednumber = InterruptReport_NumberFormat(InterruptReportConfig.DAMAGE_TAKEN);
+		
 		if ( channel == "self" ) then
-			ChatFrame1:AddMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
+			ChatFrame1:AddMessage( formattednumber .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
 		else
 			if ( InterruptReportConfig.REPORTED == nil ) then
-				SendChatMessage( InterruptReportConfig.DAMAGE_TAKEN .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
+				SendChatMessage( formattednumber .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
 			end
 		end
 	
 		for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
+			if ( InterruptReportConfig.INTERRUPT_LIST[i+1] > 1 ) then
+				timesortime = " times.";
+			else
+				timesortime = " time."
+			end
+			
 			if ( channel == "self") then
 				ChatFrame1:AddMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
-										InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , .9, .9, .9);
+										InterruptReportConfig.INTERRUPT_LIST[i+1] .. timesortime , .9, .9, .9);
 			else
 				if ( InterruptReportConfig.REPORTED ) then
 					-- ChatFrame1:AddMessage( InterruptReportConfig.REPORTED .. " already announced damage and interrupts." , .9, 0, .9);
 				else
 					SendChatMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
-										InterruptReportConfig.INTERRUPT_LIST[i+1] .. " times." , channel , nil , nil );
+										InterruptReportConfig.INTERRUPT_LIST[i+1] .. timesortime , channel , nil , nil );
 					SendAddonMessage( "InterruptReport" , UnitName("player") , channel , nil);
 				end
 			end
@@ -355,4 +380,4 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 	end	
 	
-end -- 358 lines of boring code. With no library dependencies.
+end -- 383 lines of boring code. With no library dependencies.
