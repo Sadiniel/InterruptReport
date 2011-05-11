@@ -311,11 +311,11 @@ function InterruptReport_OnEvent(self, event, ...)
 	
 	elseif	( event == "PLAYER_REGEN_DISABLED" ) then
 	
+		InterruptReportConfig.REPORTED = nil;
+	
 		if	( InterruptReportConfig.ENABLED ) then
-		
-			local inInstance, instanceType = IsInInstance();
-		
-			if	( ( inInstance ) and ( instanceType == "raid" ) ) then
+				
+			if	( UnitInRaid("player") ) then
 				
 				-- ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9); -- debug
 				
