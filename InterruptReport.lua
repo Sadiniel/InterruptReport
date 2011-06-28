@@ -223,10 +223,10 @@ function InterruptReport_Announce(self)
 		local formattednumber = InterruptReport_NumberFormat(InterruptReportConfig.DAMAGE_TAKEN);
 		
 		if ( channel == "self" ) then
-			ChatFrame1:AddMessage( formattednumber .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
+			ChatFrame1:AddMessage( formattednumber .. " damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
 		else
 			if ( InterruptReportConfig.REPORTED == nil ) then
-				SendChatMessage( formattednumber .. " preventable damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
+				SendChatMessage( formattednumber .. " damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
 			end
 		end
 	
@@ -342,7 +342,7 @@ function InterruptReport_OnEvent(self, event, ...)
 				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
 				if ( amount == nil ) then amount = 0; end
 				
-				InterruptReportConfig.DAMAGE_SPELL = spellName;
+				InterruptReportConfig.DAMAGE_SPELL = GetSpellLink(spellId);
 				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
 				
 			end
