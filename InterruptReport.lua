@@ -9,6 +9,8 @@ local SPELL_LIST = {	"Arcane Annihilator", 	-- Arcanotron, Omnotron Defense Syst
 						"Shadow Nova", 			-- Halfus Wyrmbreaker, Bastion of Twilight (Only if Storm Rider is active)
 						"Hydro Lance", 			-- Feludius, Ascendant Council, Bastion of Twilight
 						"Depravity",			-- Corrupting Adherent, Cho'gall, Bastion of Twilight
+						"Fiery Web Spin",		-- Cinderweb Spinner (Heroic), Beth'tilac, Firelands
+						"Fieroblast",			-- Blazing Talon Initiate, Alysrazor, Firelands
 						}
 
 function InterruptReport_Config()
@@ -328,9 +330,9 @@ function InterruptReport_OnEvent(self, event, ...)
 			
 	elseif	( event == "COMBAT_LOG_EVENT_UNFILTERED" ) then
 	
-		local timestamp, logtype, hideCaster, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, -- arg1  to arg9
-		spellId, spellName, spellSchool, -- arg10  to arg12
-		amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ... ; -- arg13 to arg21
+		local timestamp, logtype, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, -- arg1  to arg11
+		spellId, spellName, spellSchool, -- arg12  to arg14
+		amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ... ; -- arg15 to arg23
 		
 		if ( logtype == "SPELL_DAMAGE" ) then
 		

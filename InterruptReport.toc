@@ -1,6 +1,6 @@
 ## Interface: 40200
 ## Title: InterruptReport
-## Version: 4.2.0.01
+## Version: 4.2.0.02
 ## Author: Sadiniel <Dispel Stupid> of Garona-US
 ## Notes: Tracks Spell Interrupts during boss encounters and reports preventable damage.
 ## SavedVariablesPerCharacter: InterruptReportConfig
