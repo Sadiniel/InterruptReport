@@ -344,7 +344,8 @@ function InterruptReport_OnEvent(self, event, ...)
 				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
 				if ( amount == nil ) then amount = 0; end
 				
-				InterruptReportConfig.DAMAGE_SPELL = GetSpellLink(spellId);
+				-- InterruptReportConfig.DAMAGE_SPELL = GetSpellLink(spellId);
+				InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. spellId .. "\124h[" .. spellName .. "]\124h\124r";
 				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
 				
 			end
@@ -356,7 +357,8 @@ function InterruptReport_OnEvent(self, event, ...)
 			if ( tContains(SPELL_LIST, overkill) ) then
 
 				-- ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9); -- debug
-				InterruptReportConfig.DAMAGE_SPELL = overkill;
+				-- InterruptReportConfig.DAMAGE_SPELL = overkill;
+				InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. amount .. "\124h[" .. overkill .. "]\124h\124r";
 				
 				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
 					local n = 1;
