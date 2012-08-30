@@ -3,7 +3,8 @@
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
-local SPELL_LIST = {	"Arcane Annihilator", 	-- Arcanotron, Omnotron Defense System, Blackwing Descent
+local SPELL_LIST = {	-- Cataclysm
+						"Arcane Annihilator", 	-- Arcanotron, Omnotron Defense System, Blackwing Descent
 						"Arcane Storm",			-- Maloriak, Blackwing Descent
 						"Blast Nova",			-- Chromatic Prototype, Nefarian, Blackwing Descent
 						"Shadow Nova", 			-- Halfus Wyrmbreaker, Bastion of Twilight (Only if Storm Rider is active)
@@ -11,6 +12,10 @@ local SPELL_LIST = {	"Arcane Annihilator", 	-- Arcanotron, Omnotron Defense Syst
 						"Depravity",			-- Corrupting Adherent, Cho'gall, Bastion of Twilight
 						"Fiery Web Spin",		-- Cinderweb Spinner (Heroic), Beth'tilac, Firelands
 						"Fieroblast",			-- Blazing Talon Initiate, Alysrazor, Firelands
+						-- Mysts of Pandaria
+						"Shadow Blast",			-- Tian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
+						"Lightning Bolt",		-- Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
+						"Water Bolt",			-- Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
 						}
 
 function InterruptReport_Config()
@@ -224,6 +229,11 @@ function InterruptReport_Announce(self)
 		
 		local formattednumber = InterruptReport_NumberFormat(InterruptReportConfig.DAMAGE_TAKEN);
 		
+		-- This is a hack for Water Bolt and Lightning Bolt which both occur during the Protectors of The Endless fight
+		if ( ( InterruptReportConfig.DAMAGE_SPELL == "Water Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELL == "Lightning Bolt" ) ) then
+			InterruptReportConfig.DAMAGE_SPELL = "Lightning Bolt and Water Bolt";
+		end
+		
 		if ( channel == "self" ) then
 			ChatFrame1:AddMessage( formattednumber .. " damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
 		else
@@ -384,4 +394,4 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 	end	
 	
-end -- 383 lines of boring code. With no library dependencies.
+end -- 397 lines of boring code. With no library dependencies.
