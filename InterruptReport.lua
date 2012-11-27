@@ -12,7 +12,7 @@ local SPELL_LIST = {	-- Cataclysm
 						"Depravity",			-- Corrupting Adherent, Cho'gall, Bastion of Twilight
 						"Fiery Web Spin",		-- Cinderweb Spinner (Heroic), Beth'tilac, Firelands
 						"Fieroblast",			-- Blazing Talon Initiate, Alysrazor, Firelands
-						-- Mysts of Pandaria
+						-- Mists of Pandaria
 						"Shadow Blast",			-- Tian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
 						"Lightning Bolt",		-- Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
 						"Water Bolt",			-- Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
