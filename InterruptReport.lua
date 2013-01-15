@@ -1,5 +1,6 @@
 -- InterruptReport
 -- By Sadiniel <Dispel Stupid> of Garona-US
+-- local DEBUG = true;
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
@@ -16,6 +17,19 @@ local SPELL_LIST = {	-- Cataclysm
 						"Shadow Blast",			-- Tian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
 						"Lightning Bolt",		-- Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
 						"Water Bolt",			-- Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
+						}
+local CASTER_LIST = {	-- This list is basically a mirror of the list above just listing the spell caster to cross reference
+						"Arcanotron",
+						"Maloriak",
+						"Chromatic Prototype",
+						"Halfus Wyrmbreaker",
+						"Feludius",
+						"Corrupting Adherent",
+						"Cinderweb Spinner", 
+						"Blazing Talon Initiate",
+						"Tian Dreadshadow",
+						"Elder Regail",
+						"Elder Asani",
 						}
 
 function InterruptReport_Config()
@@ -264,7 +278,7 @@ function InterruptReport_Announce(self)
 		end
 	end
 	
-	-- ChatFrame1:AddMessage( "Combat Ended." , .9, 0, .9); -- debug
+	if ( DEBUG ) then ChatFrame1:AddMessage( "Combat Ended." , .9, 0, .9); end
 	
 	InterruptReportConfig.REPORTED = nil;
 	InterruptReportConfig.NEXT_CHECK = nil;
@@ -279,7 +293,7 @@ end
 function InterruptReport_CombatCheck(self)
 	
 	local combat = false;
-	local raidmembers = GetNumRaidMembers();
+	local raidmembers = GetNumGroupMembers();
 	
 	for i = 1, raidmembers do
 		local unitname = GetRaidRosterInfo(i);
@@ -329,7 +343,7 @@ function InterruptReport_OnEvent(self, event, ...)
 				
 			if	( UnitInRaid("player") ) then
 				
-				-- ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9); -- debug
+				if ( DEBUG ) then ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9); end
 				
 				self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
 				if	(InterruptReportConfig.INTERRUPT_LIST == nil) then InterruptReportConfig.INTERRUPT_LIST = {}; end
@@ -346,10 +360,9 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 		if ( logtype == "SPELL_DAMAGE" ) then
 		
-			if ( tContains(SPELL_LIST, spellName) ) then
+			if ( tContains(SPELL_LIST, spellName) and tContains(CASTER_LIST, sourceName) ) then
 			
-				-- debug
-				-- ChatFrame1:AddMessage( spellName .. " hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9);
+				if ( DEBUG ) then ChatFrame1:AddMessage( sourceName .. "'s " .. spellName .. " hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9); end
 		
 				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
 				if ( amount == nil ) then amount = 0; end
@@ -366,8 +379,8 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 			if ( tContains(SPELL_LIST, overkill) ) then
 
-				-- ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9); -- debug
-				-- InterruptReportConfig.DAMAGE_SPELL = overkill;
+				if ( DEBUG ) then ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9); end
+				
 				InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. amount .. "\124h[" .. overkill .. "]\124h\124r";
 				
 				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
