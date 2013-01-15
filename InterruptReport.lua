@@ -1,6 +1,7 @@
 -- InterruptReport
 -- By Sadiniel <Dispel Stupid> of Garona-US
 -- local DEBUG = true;
+-- Just need something to force an update.
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
