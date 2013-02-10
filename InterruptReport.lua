@@ -15,7 +15,7 @@ local SPELL_LIST = {	-- Cataclysm
 						"Fiery Web Spin",		-- Cinderweb Spinner (Heroic), Beth'tilac, Firelands
 						"Fieroblast",			-- Blazing Talon Initiate, Alysrazor, Firelands
 						-- Mists of Pandaria
-						"Shadow Blast",			-- Tian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
+						"Shadow Blast",			-- Zian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
 						"Lightning Bolt",		-- Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
 						"Water Bolt",			-- Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
 						}
@@ -28,7 +28,7 @@ local CASTER_LIST = {	-- This list is basically a mirror of the list above just 
 						"Corrupting Adherent",
 						"Cinderweb Spinner", 
 						"Blazing Talon Initiate",
-						"Tian Dreadshadow",
+						"Zian of the Endless Shadow",
 						"Elder Regail",
 						"Elder Asani",
 						}
