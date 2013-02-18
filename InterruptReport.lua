@@ -1,7 +1,6 @@
 -- InterruptReport
 -- By Sadiniel <Dispel Stupid> of Garona-US
 -- local DEBUG = true;
--- Just need something to force an update.
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
@@ -16,6 +15,7 @@ local SPELL_LIST = {	-- Cataclysm
 						"Fieroblast",			-- Blazing Talon Initiate, Alysrazor, Firelands
 						-- Mists of Pandaria
 						"Shadow Blast",			-- Zian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
+						"Mending",				-- Zar'thik Battle-Mender, Wind Lord Mel'jarak, Heart of Fear
 						"Lightning Bolt",		-- Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
 						"Water Bolt",			-- Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
 						}
@@ -29,6 +29,7 @@ local CASTER_LIST = {	-- This list is basically a mirror of the list above just 
 						"Cinderweb Spinner", 
 						"Blazing Talon Initiate",
 						"Zian of the Endless Shadow",
+						"Zar'thik Battle-Mender",
 						"Elder Regail",
 						"Elder Asani",
 						}
@@ -237,6 +238,7 @@ function InterruptReport_Announce(self)
 	
 	local channel = InterruptReportConfig.ANNOUNCE_CHANNEL;
 	local timesortime = " times.";
+	local damageorheal = " damage taken from ";
 	
 	if ( ( InterruptReportConfig.DAMAGE_TAKEN ) or ( ( #InterruptReportConfig.INTERRUPT_LIST > 1 ) and ( InterruptReportConfig.NO_DAMAGE ) ) ) then
 		
@@ -244,16 +246,23 @@ function InterruptReport_Announce(self)
 		
 		local formattednumber = InterruptReport_NumberFormat(InterruptReportConfig.DAMAGE_TAKEN);
 		
+		InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. InterruptReportConfig.DAMAGE_SPELLID .. "\124h[" .. InterruptReportConfig.DAMAGE_SPELLNAME .. "]\124h\124r";
+		
 		-- This is a hack for Water Bolt and Lightning Bolt which both occur during the Protectors of The Endless fight
-		if ( ( InterruptReportConfig.DAMAGE_SPELL == "Water Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELL == "Lightning Bolt" ) ) then
+		if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Water Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Lightning Bolt" ) ) then
 			InterruptReportConfig.DAMAGE_SPELL = "Lightning Bolt and Water Bolt";
 		end
 		
+		-- This is to change the text for damage vs. healing
+		if ( InterruptReportConfig.DAMAGE_SPELLNAME == "Mending" ) then
+			damageorheal = " healing done by ";
+		end
+		
 		if ( channel == "self" ) then
-			ChatFrame1:AddMessage( formattednumber .. " damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
+			ChatFrame1:AddMessage( formattednumber .. damageorheal .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
 		else
 			if ( InterruptReportConfig.REPORTED == nil ) then
-				SendChatMessage( formattednumber .. " damage taken from " .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
+				SendChatMessage( formattednumber .. damageorheal .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
 			end
 		end
 	
@@ -287,6 +296,8 @@ function InterruptReport_Announce(self)
 	
 	InterruptReportConfig.DAMAGE_TAKEN = nil;
 	InterruptReportConfig.DAMAGE_SPELL = nil;
+	InterruptReportConfig.DAMAGE_SPELLID = nil;
+	InterruptReportConfig.DAMAGE_SPELLNAME = nil;
 	wipe(InterruptReportConfig.INTERRUPT_LIST);
 	
 end
@@ -368,9 +379,11 @@ function InterruptReport_OnEvent(self, event, ...)
 				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
 				if ( amount == nil ) then amount = 0; end
 				
-				-- InterruptReportConfig.DAMAGE_SPELL = GetSpellLink(spellId);
-				InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. spellId .. "\124h[" .. spellName .. "]\124h\124r";
-				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
+				InterruptReportConfig.DAMAGE_SPELLID = spellId;
+				InterruptReportConfig.DAMAGE_SPELLNAME = spellName;
+				
+				-- InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. spellId .. "\124h[" .. spellName .. "]\124h\124r";
+				-- InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
 				
 			end
 			
@@ -382,7 +395,10 @@ function InterruptReport_OnEvent(self, event, ...)
 
 				if ( DEBUG ) then ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9); end
 				
-				InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. amount .. "\124h[" .. overkill .. "]\124h\124r";
+				InterruptReportConfig.DAMAGE_SPELLID = amount;
+				InterruptReportConfig.DAMAGE_SPELLNAME = overkill;
+				
+				-- InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. amount .. "\124h[" .. overkill .. "]\124h\124r";
 				
 				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
 					local n = 1;
