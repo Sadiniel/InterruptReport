@@ -391,7 +391,7 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 		if ( logtype == "SPELL_INTERRUPT" ) then
 		
-			if ( tContains(SPELL_LIST, overkill) ) then
+			if ( tContains(SPELL_LIST, overkill) and tContains(CASTER_LIST, destName) ) then
 
 				if ( DEBUG ) then ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9); end
 				
