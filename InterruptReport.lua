@@ -5,33 +5,21 @@
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
 local SPELL_LIST = {	-- Cataclysm
-						"Arcane Annihilator", 	-- Arcanotron, Omnotron Defense System, Blackwing Descent
-						"Arcane Storm",			-- Maloriak, Blackwing Descent
-						"Blast Nova",			-- Chromatic Prototype, Nefarian, Blackwing Descent
-						"Shadow Nova", 			-- Halfus Wyrmbreaker, Bastion of Twilight (Only if Storm Rider is active)
-						"Hydro Lance", 			-- Feludius, Ascendant Council, Bastion of Twilight
-						"Depravity",			-- Corrupting Adherent, Cho'gall, Bastion of Twilight
-						"Fiery Web Spin",		-- Cinderweb Spinner (Heroic), Beth'tilac, Firelands
-						"Fieroblast",			-- Blazing Talon Initiate, Alysrazor, Firelands
+						79710,	-- Arcane Annihilator, Arcanotron, Omnotron Defense System, Blackwing Descent
+						77908,	-- Arcane Storm, Maloriak, Blackwing Descent
+						80734,	-- Blast Nova, Chromatic Prototype, Nefarian, Blackwing Descent
+						86166,	-- Shadow Nova, Halfus Wyrmbreaker, Bastion of Twilight (Only if Storm Rider is active)
+						92509,	-- Hydro Lance, Feludius, Ascendant Council, Bastion of Twilight
+						93176,	-- Depravity, Corrupting Adherent, Cho'gall, Bastion of Twilight
+						97202,	-- Fiery Web Spin, Cinderweb Spinner (Heroic), Beth'tilac, Firelands
+						101223,	-- Fieroblast, Blazing Talon Initiate, Alysrazor, Firelands
 						-- Mists of Pandaria
-						"Shadow Blast",			-- Zian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
-						"Mending",				-- Zar'thik Battle-Mender, Wind Lord Mel'jarak, Heart of Fear
-						"Lightning Bolt",		-- Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
-						"Water Bolt",			-- Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
-						}
-local CASTER_LIST = {	-- This list is basically a mirror of the list above just listing the spell caster to cross reference
-						"Arcanotron",
-						"Maloriak",
-						"Chromatic Prototype",
-						"Halfus Wyrmbreaker",
-						"Feludius",
-						"Corrupting Adherent",
-						"Cinderweb Spinner", 
-						"Blazing Talon Initiate",
-						"Zian of the Endless Shadow",
-						"Zar'thik Battle-Mender",
-						"Elder Regail",
-						"Elder Asani",
+						117628,	-- Shadow Blast, Zian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
+						122193,	-- Mending (Cast), Zar'thik Battle-Mender, Wind Lord Mel'jarak, Heart of Fear
+						122147,	-- Mending (Effect), Zar'thik Battle-Mender, Wind Lord Mel'jarak, Heart of Fear
+						117187,	-- Lightning Bolt, Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
+						117163,	-- Water Bolt, Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
+						130781,	-- Tail Whip (Test NPC skill), Kunzen Ravager, Valley of the Four Winds
 						}
 
 function InterruptReport_Config()
@@ -307,6 +295,10 @@ function InterruptReport_CombatCheck(self)
 	local combat = false;
 	local raidmembers = GetNumGroupMembers();
 	
+	if ( UnitAffectingCombat("player") and DEBUG ) then
+		combat = true;
+	end
+	
 	for i = 1, raidmembers do
 		local unitname = GetRaidRosterInfo(i);
 		if ( unitname ) then
@@ -353,7 +345,7 @@ function InterruptReport_OnEvent(self, event, ...)
 	
 		if	( InterruptReportConfig.ENABLED ) then
 				
-			if	( UnitInRaid("player") ) then
+			if	( UnitInRaid("player") or DEBUG ) then
 				
 				if ( DEBUG ) then ChatFrame1:AddMessage( "Combat Started." , .9, 0, .9); end
 				
@@ -370,26 +362,57 @@ function InterruptReport_OnEvent(self, event, ...)
 		spellId, spellName, spellSchool, -- arg12  to arg14
 		amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ... ; -- arg15 to arg23
 		
+		if ( amount == nil ) then amount = 0; end
+		if ( resisted == nil ) then resisted = 0; end
+		if ( absorbed == nil ) then absorbed = 0; end
+		if ( overkill == nil ) then overkill = 0; end
+		
 		if ( logtype == "SPELL_DAMAGE" ) then
 		
-			if ( tContains(SPELL_LIST, spellName) and tContains(CASTER_LIST, sourceName) ) then
+			-- if ( DEBUG ) then ChatFrame1:AddMessage( timestamp .. " : " .. logtype .. " : hideCaster : " .. sourceGUID .. " : " .. sourceName .. " : " .. sourceFlags .. " : " .. sourceRaidFlags .. " : " .. destGUID .. " : " .. destName .. " : " .. destFlags .. " : " .. destRaidFlags , .9, 0, .9); end
+			-- if ( DEBUG ) then ChatFrame1:AddMessage( spellId .. " : " .. spellName .. " : " .. spellSchool .. " : " .. amount .. " : " .. overkill .. " : " .. school , .9, 0, .9); end
+
+			if ( tContains(SPELL_LIST, spellId) ) then
 			
-				if ( DEBUG ) then ChatFrame1:AddMessage( sourceName .. "'s " .. spellName .. " hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed. )" , .9, 0, .9); end
-		
+				if ( DEBUG ) then ChatFrame1:AddMessage( sourceName .. "'s " .. spellName .. " hit " .. destName .. " for " .. amount .. ". ( " .. resisted .. " resisted / " .. absorbed .. " absorbed )" , .9, 0, .9); end
+				
 				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
-				if ( amount == nil ) then amount = 0; end
 				
 				InterruptReportConfig.DAMAGE_SPELLID = spellId;
 				InterruptReportConfig.DAMAGE_SPELLNAME = spellName;
-				
-				-- InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. spellId .. "\124h[" .. spellName .. "]\124h\124r";
-				-- InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
+				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
 				
 			end
 			
-		end
+		elseif ( logtype == "SPELL_HEAL" ) then
 		
-		if ( logtype == "SPELL_INTERRUPT" ) then
+			if ( tContains(SPELL_LIST, spellId) ) then
+			
+				if ( DEBUG ) then ChatFrame1:AddMessage( sourceName .. "'s " .. spellName .. " healed " .. destName .. " for " .. amount .. ". ( " .. overkill .. " overhealed )" , .9, 0, .9); end
+		
+				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
+				
+				InterruptReportConfig.DAMAGE_SPELLID = spellId;
+				InterruptReportConfig.DAMAGE_SPELLNAME = spellName;
+				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
+				
+			end
+			
+		elseif ( logtype == "SPELL_PERIODIC_HEAL" ) then
+		
+			if ( tContains(SPELL_LIST, spellId) ) then
+			
+				if ( DEBUG ) then ChatFrame1:AddMessage( sourceName .. "'s " .. spellName .. " healed " .. destName .. " for " .. amount .. ". ( " .. overkill .. " overhealed )" , .9, 0, .9); end
+		
+				if ( InterruptReportConfig.DAMAGE_TAKEN == nil ) then InterruptReportConfig.DAMAGE_TAKEN = 0; end
+				
+				InterruptReportConfig.DAMAGE_SPELLID = spellId;
+				InterruptReportConfig.DAMAGE_SPELLNAME = spellName;
+				InterruptReportConfig.DAMAGE_TAKEN = InterruptReportConfig.DAMAGE_TAKEN + amount;
+				
+			end
+			
+		elseif ( logtype == "SPELL_INTERRUPT" ) then
 		
 			if ( tContains(SPELL_LIST, overkill) and tContains(CASTER_LIST, destName) ) then
 
@@ -397,8 +420,6 @@ function InterruptReport_OnEvent(self, event, ...)
 				
 				InterruptReportConfig.DAMAGE_SPELLID = amount;
 				InterruptReportConfig.DAMAGE_SPELLNAME = overkill;
-				
-				-- InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. amount .. "\124h[" .. overkill .. "]\124h\124r";
 				
 				if ( tContains(InterruptReportConfig.INTERRUPT_LIST, sourceName) ) then
 					local n = 1;
