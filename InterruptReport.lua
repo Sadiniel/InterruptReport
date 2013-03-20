@@ -17,6 +17,8 @@ local SPELL_LIST = {	-- Cataclysm
 						117628,	-- Shadow Blast, Zian Dreadshadow, The Spirit Emperors, Mogu'shan Vaults
 						122193,	-- Mending (Cast), Zar'thik Battle-Mender, Wind Lord Mel'jarak, Heart of Fear
 						122147,	-- Mending (Effect), Zar'thik Battle-Mender, Wind Lord Mel'jarak, Heart of Fear
+						122398, -- Amber Explosion (player), Amber-Shaper Un'sok, Heart of Fear
+						122402, -- Amber Explosion, Amber Mostrosity, Amber-Shaper Un'sok, Heart of Fear
 						117187,	-- Lightning Bolt, Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
 						117163,	-- Water Bolt, Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
 						130781,	-- Tail Whip (Test NPC skill), Kunzen Ravager, Valley of the Four Winds

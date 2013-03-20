@@ -1,6 +1,6 @@
 ## Interface: 50200
 ## Title: InterruptReport
-## Version: 5.2.0.2
+## Version: 5.2.0.3
 ## Author: Sadiniel <Dispel Stupid> of Zul'jin (Horde)-US
 ## Notes: Tracks Spell Interrupts during boss encounters and reports preventable damage and healing.
 ## SavedVariablesPerCharacter: InterruptReportConfig
