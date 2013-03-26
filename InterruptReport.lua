@@ -21,6 +21,10 @@ local SPELL_LIST = {	-- Cataclysm
 						122402, -- Amber Explosion, Amber Mostrosity, Amber-Shaper Un'sok, Heart of Fear
 						117187,	-- Lightning Bolt, Elder Regail, Protectors of the Endless, Terrace of the Endless Spring
 						117163,	-- Water Bolt, Elder Asani, Protectors of the Endless, Terrace of the Endless Spring
+						136189, -- Sand Bolt, Sul the Sandcrawler, Council of Elders, Throne of Thunder
+						137344, -- Wrath of the Loa (Holy), High Priestess Mar'li, Council of Elders, Throne of Thunder
+						137347, -- Wrath of the Loa (Shadow), High Priestess Mar'li, Council of Elders, Throne of Thunder
+												
 						130781,	-- Tail Whip (Test NPC skill), Kunzen Ravager, Valley of the Four Winds
 						}
 
@@ -241,6 +245,11 @@ function InterruptReport_Announce(self)
 		-- This is a hack for Water Bolt and Lightning Bolt which both occur during the Protectors of The Endless fight
 		if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Water Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Lightning Bolt" ) ) then
 			InterruptReportConfig.DAMAGE_SPELL = "Lightning Bolt and Water Bolt";
+		end
+		
+		-- This is a hack for Sand Bolt and Wrath of the Loa which both occur during the Protectors of The Endless fight
+		if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Sand Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Wrath of the Loa" ) ) then
+			InterruptReportConfig.DAMAGE_SPELL = "Sand Bolt and Wrath of the Loa";
 		end
 		
 		-- This is to change the text for damage vs. healing
