@@ -244,12 +244,12 @@ function InterruptReport_Announce(self)
 		
 		-- This is a hack for Water Bolt and Lightning Bolt which both occur during the Protectors of The Endless fight
 		if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Water Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Lightning Bolt" ) ) then
-			InterruptReportConfig.DAMAGE_SPELL = "Lightning Bolt and Water Bolt";
+			InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:117187\124h[Lightning Bolt]\124h\124r and \124cff71d5ff\124Hspell:117163\124h[Water Bolt]\124h\124r";
 		end
 		
-		-- This is a hack for Sand Bolt and Wrath of the Loa which both occur during the Protectors of The Endless fight
+		-- This is a hack for Sand Bolt and Wrath of the Loa which both occur during the Council of Enders fight
 		if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Sand Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Wrath of the Loa" ) ) then
-			InterruptReportConfig.DAMAGE_SPELL = "Sand Bolt and Wrath of the Loa";
+			InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:136189\124h[Sand Bolt]\124h\124r, \124cff71d5ff\124Hspell:137344\124h[Wrath of the Loa]\124h\124r, and \124cff71d5ff\124Hspell:137347\124h[Wrath of the Loa]\124h\124r";
 		end
 		
 		-- This is to change the text for damage vs. healing
@@ -345,8 +345,8 @@ function InterruptReport_OnEvent(self, event, ...)
 	
 	elseif	( ( event == "CHAT_MSG_ADDON" ) and ( select(1, ...) == "InterruptReport" ) ) then
 		
-		-- If someone announces before you their addon tells yours name of the target they
-		-- looted to prevent yours from announcing it too.
+		-- If someone announces before you their addon tells yours who announced
+		-- to prevent yours from announcing it too.
 		
 		InterruptReportConfig.REPORTED = select(2, ...);
 	
@@ -425,7 +425,7 @@ function InterruptReport_OnEvent(self, event, ...)
 			
 		elseif ( logtype == "SPELL_INTERRUPT" ) then
 		
-			if ( tContains(SPELL_LIST, overkill) and tContains(CASTER_LIST, destName) ) then
+			if ( tContains(SPELL_LIST, amount) ) then
 
 				if ( DEBUG ) then ChatFrame1:AddMessage( overkill .. " was interrupted by " .. sourceName , .9, 0, .9); end
 				
@@ -456,4 +456,4 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 	end	
 	
-end -- 397 lines of boring code. With no library dependencies.
+end -- 459 lines of boring code. With no library dependencies.
