@@ -24,9 +24,18 @@ local SPELL_LIST = {	-- Cataclysm
 						136189, -- Sand Bolt, Sul the Sandcrawler, Council of Elders, Throne of Thunder
 						137344, -- Wrath of the Loa (Holy), High Priestess Mar'li, Council of Elders, Throne of Thunder
 						137347, -- Wrath of the Loa (Shadow), High Priestess Mar'li, Council of Elders, Throne of Thunder
-												
-						130781,	-- Tail Whip (Test NPC skill), Kunzen Ravager, Valley of the Four Winds
-						}
+						145631, -- Corruption Chain, Embodied Gloom, The Fallen Protectors, Siege of Orgrimmar
+						143423, -- Sha Sear, Sun Tenderheart, The Fallen Protectors, Siege of Orgrimmar
+						144649, -- Hurl Corruption, Titanic Corruption, Norushen, Siege of Orgrimmar
+						144379, -- Mocking Blast, Manifestation of Pride, Sha of Pride, Siege of Orgrimmar
+						143431, -- Magistrike, Kor'kron Arcweaver, General Nazgrim, Siege of Orgrimmar
+						143432, -- Arcane Shock, Kor'kron Arcweaver, General Nazgrim, Siege of Orgrimmar
+						145230, -- Forbidden Magic, Mogu Shadow Ritualist, Spoils of Pandaria, Siege of Orgrimmar
+						144923, -- Earthen Shard, Animated Stone Mogu, Spoils of Pandaria, Siege of Orgrimmar
+						144584, -- Chain Lightning, Farseer Wolf Rider, Garrosh Hellscream, Siege of Orgrimmar
+
+						-- 130781,	-- Tail Whip (Test NPC skill), Kunzen Ravager, Valley of the Four Winds
+}
 
 function InterruptReport_Config()
 
