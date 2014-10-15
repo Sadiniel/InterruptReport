@@ -1,6 +1,6 @@
 -- InterruptReport
 -- By Sadiniel <Dispel Stupid> of Garona-US
--- local DEBUG = true;
+local DEBUG = false;
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
 local InterruptReport = CreateFrame("Frame", "InterruptReport");
@@ -34,7 +34,7 @@ local SPELL_LIST = {	-- Cataclysm
 						144923, -- Earthen Shard, Animated Stone Mogu, Spoils of Pandaria, Siege of Orgrimmar
 						144584, -- Chain Lightning, Farseer Wolf Rider, Garrosh Hellscream, Siege of Orgrimmar
 
-						-- 130781,	-- Tail Whip (Test NPC skill), Kunzen Ravager, Valley of the Four Winds
+						-- 9739,	-- Wrath (Test NPC skill), Talrendis Lorekeeper, Azshara
 }
 
 function InterruptReport_Config()
