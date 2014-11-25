@@ -249,48 +249,56 @@ function InterruptReport_Announce(self)
 		
 		local formattednumber = InterruptReport_NumberFormat(InterruptReportConfig.DAMAGE_TAKEN);
 		
-		InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. InterruptReportConfig.DAMAGE_SPELLID .. "\124h[" .. InterruptReportConfig.DAMAGE_SPELLNAME .. "]\124h\124r";
-		
-		-- This is a hack for Water Bolt and Lightning Bolt which both occur during the Protectors of The Endless fight
-		if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Water Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Lightning Bolt" ) ) then
-			InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:117187\124h[Lightning Bolt]\124h\124r and \124cff71d5ff\124Hspell:117163\124h[Water Bolt]\124h\124r";
-		end
-		
-		-- This is a hack for Sand Bolt and Wrath of the Loa which both occur during the Council of Enders fight
-		if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Sand Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Wrath of the Loa" ) ) then
-			InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:136189\124h[Sand Bolt]\124h\124r, \124cff71d5ff\124Hspell:137344\124h[Wrath of the Loa]\124h\124r, and \124cff71d5ff\124Hspell:137347\124h[Wrath of the Loa]\124h\124r";
-		end
-		
-		-- This is to change the text for damage vs. healing
-		if ( InterruptReportConfig.DAMAGE_SPELLNAME == "Mending" ) then
-			damageorheal = " healing done by ";
-		end
-		
-		if ( channel == "self" ) then
-			ChatFrame1:AddMessage( formattednumber .. damageorheal .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
+		if ( ( InterruptReportConfig.DAMAGE_SPELLID == nil ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == nil ) ) then
+			if ( InterruptReportConfig.DAMAGE_SPELLID ~= nil ) then
+				ChatFrame1:AddMessage( "Please leave a comment on Curse for InterruptReport with " .. InterruptReportConfig.DAMAGE_SPELLID .. ", Thank you.", .9, .9, .9); end
+			if ( InterruptReportConfig.DAMAGE_SPELLNAME ~= nil ) then
+				ChatFrame1:AddMessage( "Please leave a comment on Curse for InterruptReport with " .. InterruptReportConfig.DAMAGE_SPELLNAME .. ", Thank you.", .9, .9, .9); end
 		else
-			if ( InterruptReportConfig.REPORTED == nil ) then
-				SendChatMessage( formattednumber .. damageorheal .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
+		
+			InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:" .. InterruptReportConfig.DAMAGE_SPELLID .. "\124h[" .. InterruptReportConfig.DAMAGE_SPELLNAME .. "]\124h\124r";
+		
+			-- This is a hack for Water Bolt and Lightning Bolt which both occur during the Protectors of The Endless fight
+			if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Water Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Lightning Bolt" ) ) then
+				InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:117187\124h[Lightning Bolt]\124h\124r and \124cff71d5ff\124Hspell:117163\124h[Water Bolt]\124h\124r";
 			end
-		end
+		
+			-- This is a hack for Sand Bolt and Wrath of the Loa which both occur during the Council of Enders fight
+			if ( ( InterruptReportConfig.DAMAGE_SPELLNAME == "Sand Bolt" ) or ( InterruptReportConfig.DAMAGE_SPELLNAME == "Wrath of the Loa" ) ) then
+				InterruptReportConfig.DAMAGE_SPELL = "\124cff71d5ff\124Hspell:136189\124h[Sand Bolt]\124h\124r, \124cff71d5ff\124Hspell:137344\124h[Wrath of the Loa]\124h\124r, and \124cff71d5ff\124Hspell:137347\124h[Wrath of the Loa]\124h\124r";
+			end
+		
+			-- This is to change the text for damage vs. healing
+			if ( InterruptReportConfig.DAMAGE_SPELLNAME == "Mending" ) then
+				damageorheal = " healing done by ";
+			end
+		
+			if ( channel == "self" ) then
+				ChatFrame1:AddMessage( formattednumber .. damageorheal .. InterruptReportConfig.DAMAGE_SPELL .. ".", .9, .9, .9);
+			else
+				if ( InterruptReportConfig.REPORTED == nil ) then
+					SendChatMessage( formattednumber .. damageorheal .. InterruptReportConfig.DAMAGE_SPELL .. ".", channel , nil , nil );
+				end
+			end
 	
-		for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
-			if ( InterruptReportConfig.INTERRUPT_LIST[i+1] > 1 ) then
-				timesortime = " times.";
-			else
-				timesortime = " time."
-			end
-			
-			if ( channel == "self") then
-				ChatFrame1:AddMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
-										InterruptReportConfig.INTERRUPT_LIST[i+1] .. timesortime , .9, .9, .9);
-			else
-				if ( InterruptReportConfig.REPORTED ) then
-					-- ChatFrame1:AddMessage( InterruptReportConfig.REPORTED .. " already announced damage and interrupts." , .9, 0, .9);
+			for i=1, #InterruptReportConfig.INTERRUPT_LIST, 2 do
+				if ( InterruptReportConfig.INTERRUPT_LIST[i+1] > 1 ) then
+					timesortime = " times.";
 				else
-					SendChatMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
-										InterruptReportConfig.INTERRUPT_LIST[i+1] .. timesortime , channel , nil , nil );
-					SendAddonMessage( "InterruptReport" , UnitName("player") , channel , nil);
+					timesortime = " time."
+				end
+			
+				if ( channel == "self") then
+					ChatFrame1:AddMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
+											InterruptReportConfig.INTERRUPT_LIST[i+1] .. timesortime , .9, .9, .9);
+				else
+					if ( InterruptReportConfig.REPORTED ) then
+						-- ChatFrame1:AddMessage( InterruptReportConfig.REPORTED .. " already announced damage and interrupts." , .9, 0, .9);
+					else
+						SendChatMessage(	InterruptReportConfig.INTERRUPT_LIST[i] .. " interrupted " ..
+											InterruptReportConfig.INTERRUPT_LIST[i+1] .. timesortime , channel , nil , nil );
+						SendAddonMessage( "InterruptReport" , UnitName("player") , channel , nil);
+					end
 				end
 			end
 		end
@@ -465,4 +473,4 @@ function InterruptReport_OnEvent(self, event, ...)
 		
 	end	
 	
-end -- 459 lines of boring code. With no library dependencies.
+end
