@@ -1,13 +1,9 @@
-## Interface: 60000
+## Interface: 60100
 ## Title: InterruptReport
-## Version: 6.0.0.2
-## Author: Sadiniel <Dispel Stupid> of Zul'jin (Horde)-US
+## Version: 6.1.0.1
+## Author: Sadiniae <Prophet of Cthulhu> on Garona-Alliance-US
 ## Notes: Tracks Spell Interrupts during boss encounters and reports preventable damage and healing.
 ## SavedVariablesPerCharacter: InterruptReportConfig
-## X-Curse-Packaged-Version: 5.3.0.1
-## X-Curse-Project-Name: InterruptReport
-## X-Curse-Project-ID: interruptreport
-## X-Curse-Repository-ID: wow/interruptreport/mainline
 
 InterruptReport.lua
 InterruptReport.xml

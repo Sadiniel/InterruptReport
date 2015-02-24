@@ -1,5 +1,5 @@
 -- InterruptReport
--- By Sadiniel <Dispel Stupid> of Garona-US
+-- By Sadiniae <Prophet of Cthulhu> on Garona-Alliance-US
 local DEBUG = false;
 
 local IRversion = GetAddOnMetadata("InterruptReport", "Version");
