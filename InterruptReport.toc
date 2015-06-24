@@ -1,6 +1,6 @@
-## Interface: 60100
+## Interface: 60200
 ## Title: InterruptReport
-## Version: 6.1.0.1
+## Version: 6.2.0.1
 ## Author: Sadiniae <Prophet of Cthulhu> on Garona-Alliance-US
 ## Notes: Tracks Spell Interrupts during boss encounters and reports preventable damage and healing.
 ## SavedVariablesPerCharacter: InterruptReportConfig
